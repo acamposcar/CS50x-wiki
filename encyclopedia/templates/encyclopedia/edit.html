@@ -5,8 +5,13 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ title }}</h1>
-
-    <div> {{ entry }}</div>
-
+    <h1>Edit - {{ title }}</h1>
+    <form action="{% url 'edit' title %}" method="post">
+        {% csrf_token %}
+        <div>
+            <textarea name="content"> {{ entry }}</textarea>
+        </div>
+        
+        <input type="submit" value="Save Entry">
+    </form>
 {% endblock %}
