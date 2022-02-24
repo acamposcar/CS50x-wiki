@@ -6,14 +6,26 @@ from django import forms
 from . import util
 from markdown2 import Markdown
 
-
 import random
+
+
+class newEntry(forms.Form):
+    title = forms.CharField(widget=forms.TextInput(
+        attrs={"placeholder": "Title", "class":"form-control"}),  required=True)
+    content = forms.CharField(widget=forms.Textarea(
+        attrs={"placeholder": "Content (using Markdown syntax)", "rows":15, "class":"form-control"}), required=True)
+
+class editEntry(forms.Form):
+    content = forms.CharField(widget=forms.Textarea(
+        attrs={"rows":15, "class":"form-control"}), required=True)
+
 
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
+
 
 def entry(request, title):
     entry = util.get_entry(title)
@@ -25,7 +37,7 @@ def entry(request, title):
     else:
         return render(request, "encyclopedia/404.html")
 
-      
+
 def new(request):
     if request.method == "POST":
         title = request.POST['title'].strip()
@@ -33,8 +45,7 @@ def new(request):
         for existing_title in util.list_entries():
             if title.upper() == existing_title.upper().strip():
                 return render(request, "encyclopedia/new.html", {
-                    "title": title,
-                    "content": content,
+                    "form": newEntry(initial={'title': title, 'content':content}),
                     "message": "This entry already exists. Choose another title."
             })
 
@@ -44,8 +55,7 @@ def new(request):
 
     else:
         return render(request, "encyclopedia/new.html", {
-            "title": "",
-            "content": "",
+            "form": newEntry(),
             "message": ""
         })
 
@@ -53,7 +63,6 @@ def new(request):
 def random_entry(request):
     title = random.choice(util.list_entries())
     return HttpResponseRedirect(reverse("entry", kwargs={'title': title}))
-
 
  
 def edit(request, title):
@@ -67,10 +76,11 @@ def edit(request, title):
         if entry:
             return render(request, "encyclopedia/edit.html", {
                 "title": title,
-                "entry": entry
+                "form": editEntry(initial={'title': title, 'content':entry})
             })
         else:
             return render(request, "encyclopedia/404.html")
+
 
 def search(request):
     text = request.GET['q'].strip()
