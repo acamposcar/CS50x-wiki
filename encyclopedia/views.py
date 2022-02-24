@@ -4,6 +4,8 @@ from django.urls import reverse
 from django import forms
 
 from . import util
+from markdown2 import Markdown
+
 import random
 
 
@@ -17,12 +19,12 @@ def entry(request, title):
     if entry:
         return render(request, "encyclopedia/entry.html", {
             "title": title,
-            "entry": entry
+            "entry": Markdown().convert(entry)
         })
     else:
         return render(request, "encyclopedia/404.html")
 
-# TODO        
+      
 def new(request):
     if request.method == "POST":
         title = request.POST['title'].strip()
@@ -46,16 +48,13 @@ def new(request):
             "message": ""
         })
 
-# TODO: redirect to entry url (use reverse)
+
 def random_entry(request):
     title = random.choice(util.list_entries())
-    entry = util.get_entry(title)
-    return render(request, "encyclopedia/entry.html", {
-            "title": title,
-            "entry": entry
-        })
+    return HttpResponseRedirect(reverse("entry", kwargs={'title': title}))
 
-# TODO  
+
+ 
 def edit(request, title):
     if request.method == "POST":
         content = request.POST['content']
@@ -71,3 +70,27 @@ def edit(request, title):
             })
         else:
             return render(request, "encyclopedia/404.html")
+
+def search(request):
+    text = request.GET['q'].strip()
+    entry = util.get_entry(text)
+    entries = util.list_entries()
+    search_result = []
+
+    for existing_title in entries:
+        if text.upper() == existing_title.upper().strip():
+            return HttpResponseRedirect(reverse("entry", kwargs={'title': existing_title}))
+    
+    for existing_title in entries:
+        if text.upper() in existing_title.upper().strip():
+            search_result.append(existing_title)
+    if search_result:
+        return render(request, "encyclopedia/search.html", {
+            "entries": search_result,
+            "message": ""
+        })
+    else:
+        return render(request, "encyclopedia/search.html", {
+            "entries": "",
+            "message": "Article not found"
+        })
