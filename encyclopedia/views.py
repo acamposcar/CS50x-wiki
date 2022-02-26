@@ -9,13 +9,13 @@ from markdown2 import Markdown
 import random
 
 
-class newEntry(forms.Form):
+class NewEntry(forms.Form):
     title = forms.CharField(widget=forms.TextInput(
         attrs={"placeholder": "Title", "class":"form-control"}),  required=True)
     content = forms.CharField(widget=forms.Textarea(
         attrs={"placeholder": "Content (using Markdown syntax)", "rows":15, "class":"form-control"}), required=True)
 
-class editEntry(forms.Form):
+class EditEntry(forms.Form):
     content = forms.CharField(widget=forms.Textarea(
         attrs={"rows":15, "class":"form-control"}), required=True)
 
@@ -40,22 +40,28 @@ def entry(request, title):
 
 def new(request):
     if request.method == "POST":
-        title = request.POST['title'].strip()
-        content = request.POST['content']
-        for existing_title in util.list_entries():
-            if title.upper() == existing_title.upper().strip():
-                return render(request, "encyclopedia/new.html", {
-                    "form": newEntry(initial={'title': title, 'content':content}),
-                    "message": "This entry already exists. Choose another title."
-            })
-
+        form = NewEntry(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"].strip()
+            content = form.cleaned_data["content"]
+            for existing_title in util.list_entries():
+                if title.upper() == existing_title.upper().strip():
+                    return render(request, "encyclopedia/new.html", {
+                        "form": form,
+                        "message": "This entry already exists. Choose another title."
+                })
+        else:
+            return render(request, "encyclopedia/new.html", {
+                        "form": form,
+                        "message": ""
+        })
         content = f"# {title} \n\n {content}"
         util.save_entry(title, content)
         return HttpResponseRedirect(reverse("entry", kwargs={'title': title}))
 
     else:
         return render(request, "encyclopedia/new.html", {
-            "form": newEntry(),
+            "form": NewEntry(),
             "message": ""
         })
 
@@ -67,16 +73,22 @@ def random_entry(request):
  
 def edit(request, title):
     if request.method == "POST":
-        content = request.POST['content']
-        util.save_entry(title, content)
-        return HttpResponseRedirect(reverse("entry", kwargs={'title': title}))
-
+        form = EditEntry(request.POST)
+        if form.is_valid():
+            content = form.cleaned_data["content"]
+            util.save_entry(title, content)
+            return HttpResponseRedirect(reverse("entry", kwargs={'title': title}))
+        else:
+            return render(request, "encyclopedia/edit.html", {
+                "title": title,
+                "form": form
+        })
     else:
         entry = util.get_entry(title)
         if entry:
             return render(request, "encyclopedia/edit.html", {
                 "title": title,
-                "form": editEntry(initial={'title': title, 'content':entry})
+                "form": EditEntry(initial={'title': title, 'content':entry})
             })
         else:
             return render(request, "encyclopedia/404.html")
