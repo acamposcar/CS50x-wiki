@@ -135,4 +135,4 @@ if "DYNO" in os.environ:
     CSRF_COOKIE_SECURE = True
 
 # Configure Django App for Heroku.
-django_on_heroku.settings(locals(), staticfiles=False, allowed_hosts=False)
+django_on_heroku.settings(locals(), staticfiles=False)
