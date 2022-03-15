@@ -5,7 +5,8 @@
 
 Design a Wikipedia-like online encyclopedia. 
 
+[Live Demo](https://cs50web-wiki.herokuapp.com/)
+
 Technologies
-- HTML&CSS
-- Python
-- Django
+· HTML & CSS
+· Django
