@@ -14,8 +14,8 @@ Design a Wikipedia-like online encyclopedia.
 
 
 ## Technologies
-· HTML & CSS
-· Django
+- HTML & CSS
+- Django
 
 ## Installation
 
