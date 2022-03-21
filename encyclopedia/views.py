@@ -35,7 +35,7 @@ def entry(request, title):
             "entry": Markdown().convert(entry)
         })
     else:
-        return render(request, "encyclopedia/404.html")
+        return render(request, "encyclopedia/not_found.html")
 
 
 def new(request):
@@ -90,6 +90,8 @@ def edit(request, title):
                 "title": title,
                 "form": EditEntry(initial={'title': title, 'content': entry})
             })
+        else:
+            return render(request, "encyclopedia/not_found.html")
 
 
 def search(request):
@@ -115,27 +117,3 @@ def search(request):
             "entries": "",
             "message": "Article not found"
         })
-
-
-def bad_request(request, exception):
-    context = {}
-    return render(request, 'error.html', {
-        "title": "Error 400",
-        "message": "Bad request"
-    }, context, status=400)
-
-
-def permission_denied(request, exception):
-    context = {}
-    return render(request, 'error.html', {
-        "title": "Error 403",
-        "message": "Forbidden"
-    }, context, status=403)
-
-
-def page_not_found(request, exception):
-    context = {}
-    return render(request, 'error.html', {
-        "title": "Error 404",
-        "message": "Page not found"
-    }, context, status=404)
