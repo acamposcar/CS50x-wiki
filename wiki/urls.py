@@ -20,3 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("encyclopedia.urls"))
 ]
+
+handler400 = 'encyclopedia.views.bad_request'
+handler403 = 'encyclopedia.views.permission_denied'
+handler404 = 'encyclopedia.views.page_not_found'

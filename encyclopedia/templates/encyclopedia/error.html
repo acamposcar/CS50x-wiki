@@ -1,11 +1,11 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    Article not found
+{{ title }}
 {% endblock %}
 
 {% block body %}
-    <h1>Error 404 - This article does not exist.</h1>
+<h1>{{ message }}</h1>
 
 
 {% endblock %}

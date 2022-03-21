@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf.urls import handler400, handler403, handler404
 
 from . import views
 
@@ -9,5 +10,4 @@ urlpatterns = [
     path("search/", views.search, name="search"),
     path("wiki/<str:title>/", views.entry, name="entry"),
     path("wiki/<str:title>/edit/", views.edit, name="edit")
-
 ]
